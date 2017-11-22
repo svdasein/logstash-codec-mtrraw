@@ -17,10 +17,10 @@ require "logstash/namespace"
 #   stdout { codec =>  }
 # }
 #
-class LogStash::Codecs::LogstashCodecMtrraw < LogStash::Codecs::Base
+class LogStash::Codecs::Mtrraw < LogStash::Codecs::Base
 
   # The codec name
-  config_name "logstash-codec-mtrraw"
+  config_name "mtrraw"
 
   # Append a string to the message
   config :append, :validate => :string, :default => ', Hello World!'
@@ -42,4 +42,4 @@ class LogStash::Codecs::LogstashCodecMtrraw < LogStash::Codecs::Base
     event.get("message").to_s + @append + NL
   end # def encode_sync
 
-end # class LogStash::Codecs::LogstashCodecMtrraw
+end # class LogStash::Codecs::Mtrraw
