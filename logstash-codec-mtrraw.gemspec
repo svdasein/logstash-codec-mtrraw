@@ -1,10 +1,10 @@
 Gem::Specification.new do |s|
   s.name          = 'logstash-codec-mtrraw'
-  s.version       = '0.1.0'
+  s.version       = '0.0.2'
   s.licenses      = ['Apache License (2.0)']
-  s.summary       = 'TODO: Write a short summary, because Rubygems requires one.'
-  s.description   = 'TODO: Write a longer description or delete this line.'
-  s.homepage      = 'TODO: Put your plugin''s website or public repo URL here.'
+  s.summary       = 'Converts optionally overloaded mtr --raw data to an event'
+  s.description   = 'Turn mtr --raw events with optional overloading into logstash events.  see docs'
+  s.homepage      = 'https://github.com/svdasein/logstash-codec-mtrraw'
   s.authors       = ['svdasein']
   s.email         = 'daveparker01@gmail.com'
   s.require_paths = ['lib']
