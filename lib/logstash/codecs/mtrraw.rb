@@ -2,8 +2,8 @@
 require "logstash/codecs/base"
 require "logstash/codecs/line"
 require "logstash/namespace"
-require "awesome_print"
 require "securerandom"
+require "digest"
 
 
 # This codec presumes you've somehow sent in the equivalent of this
@@ -79,6 +79,7 @@ class LogStash::Codecs::Mtrraw < LogStash::Codecs::Base
 	end
     }
     path = hops.collect {|each|each[:addr]}
+    pathsig = Digest::MD5.hexdigest(path.join('-'))
     avgloss = hops.inject(0) {|loss,each| loss += each[:pingloss]} / path.size
     avgrtt = hops.inject(0.0) {|rtt,each| rtt += each[:avgrtt]} / path.size
     tracedata = { 	"id" => id,
@@ -86,6 +87,7 @@ class LogStash::Codecs::Mtrraw < LogStash::Codecs::Base
 			"message" => data ,
 			"hops" => hops,
 			"path" => path ,
+			"pathsig" => pathsig,
 			"pingcount"=>pingcount,
 			"avgloss"=>avgloss,
 			"avgrtt" => avgrtt,
@@ -98,6 +100,7 @@ class LogStash::Codecs::Mtrraw < LogStash::Codecs::Base
 	"target" => target,
 	"tags" => ["hop"],
 	"seq" => -1,
+	"pathsig" => pathsig,
 	"A_node" => "TO:#{target}",
 	"Z_node" => hops[0][:addr],
 	"dns" => "startingpoint",
@@ -109,6 +112,7 @@ class LogStash::Codecs::Mtrraw < LogStash::Codecs::Base
        yield LogStash::Event.new({	"id" => id,
 					"target" => target,
                                    	"tags" => ["hop"],
+					"pathsig" => pathsig,
 					"seq" => index,
  					"A_node" => hops[index][:addr],
 					"Z_node" => hops[index + 1][:addr],
