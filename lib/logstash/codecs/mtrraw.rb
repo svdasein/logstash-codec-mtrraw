@@ -3,6 +3,7 @@ require "logstash/codecs/base"
 require "logstash/codecs/line"
 require "logstash/namespace"
 require "awesome_print"
+require "securerandom"
 
 
 # This codec presumes you've somehow sent in the equivalent of this
@@ -30,8 +31,8 @@ class MtrHost
 		@addr = rec.data
 		@recs = recs
 		@pings = recs.select{|each| each.type == 'p'}.collect {|each|each.data}
-		@pingloss = 100.to_f - (100.to_f * (@pings.size.to_f / pingcount.to_f)) if pingcount.to_i > 0
-		@avgrtt = @pings.inject(0.0) {|counter,each| counter += each.to_f} / @pings.size
+		@pingloss = (100.to_f - (100.to_f * (@pings.size.to_f / pingcount.to_f))).to_i if pingcount.to_i > 0
+		@avgrtt = (@pings.inject(0.0) {|counter,each| counter += (each.to_f/1000)} / @pings.size).to_i
 		@dns = recs.select{|each| each.type =='d'}.collect {|each|each.data}.pop
 	end
 	def to_event_struct
@@ -61,17 +62,61 @@ class LogStash::Codecs::Mtrraw < LogStash::Codecs::Base
 		pingcount = $2
 	end
     end
+    id = SecureRandom.uuid
     hops = Array.new
     mtrrecs.each { |rec|
 	if rec.type == 'h'
-		hops.push(MtrHost.new(rec,pingcount,mtrrecs.select{|each| each.id == rec.id }).to_event_struct)
+		hop = MtrHost.new(rec,pingcount,mtrrecs.select{|each| each.id == rec.id }).to_event_struct
+		if hops.size > 1
+			if (hops[hops.size - 1][:addr] != hop[:addr])
+				hops.push(hop)
+			else
+				# It's a duplicate of the last hop - drop it
+			end
+		else
+			hops.push(hop)
+		end
 	end
     }
     path = hops.collect {|each|each[:addr]}
     avgloss = hops.inject(0) {|loss,each| loss += each[:pingloss]} / path.size
     avgrtt = hops.inject(0.0) {|rtt,each| rtt += each[:avgrtt]} / path.size
-    tracedata = { "target" => target, "message" => data , "hops" => hops,"path" => path ,"pingcount"=>pingcount,"avgloss"=>avgloss, "avgrtt" => avgrtt}
+    tracedata = { 	"id" => id,
+			"target" => target,
+			"message" => data ,
+			"hops" => hops,
+			"path" => path ,
+			"pingcount"=>pingcount,
+			"avgloss"=>avgloss,
+			"avgrtt" => avgrtt,
+			"tags" => ["wholepath"]
+	}
     yield LogStash::Event.new(tracedata)
+    # Construct a starting point for trace to target
+    yield LogStash::Event.new({
+	"id" => id,
+	"target" => target,
+	"tags" => ["hop"],
+	"seq" => -1,
+	"A_node" => "TO:#{target}",
+	"Z_node" => hops[0][:addr],
+	"dns" => "startingpoint",
+	"avgrtt" => 0,
+	"avgloss" => 0
+    })
+    0.upto(path.size - 2) {
+       |index|
+       yield LogStash::Event.new({	"id" => id,
+					"target" => target,
+                                   	"tags" => ["hop"],
+					"seq" => index,
+ 					"A_node" => hops[index][:addr],
+					"Z_node" => hops[index + 1][:addr],
+					"dns" => hops[index + 1][:dns],
+					"avgrtt" => hops[index + 1][:avgrtt],
+					"avgloss" => hops[index + 1][:avgloss]
+	})
+    }
   end # def decode
 
   # Encode a single event, this returns the raw data to be returned as a String
