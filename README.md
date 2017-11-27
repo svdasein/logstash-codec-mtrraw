@@ -10,21 +10,20 @@ The logstash mtrraw codec wraps together a bunch of logic that makes it easy to 
 
 To install it, do
 
-.Installation
- bin/logstash-plugin install logstash-codec-mtrraw
+```
+bin/logstash-plugin install logstash-codec-mtrraw
+```
 
 Configure it like this:
 
-.Logstash input configuration example
-[source,ruby]
--------------------------------------------
+```
 input {
         tcp {
                 port => 4327
                 codec => "mtrraw"
         }
 }
--------------------------------------------
+```
 
 
 ## Contributing
