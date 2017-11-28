@@ -89,6 +89,7 @@ class LogStash::Codecs::Mtrraw < LogStash::Codecs::Base
     avgloss = hops.inject(0) {|loss,each| loss += each[:pingloss]} / path.size
     avgrtt = hops.inject(0.0) {|rtt,each| rtt += each[:avgrtt]} / path.size
     tracedata = { 	"id" => id,
+			"origin" => origin,
 			"target" => target,
 			"message" => data ,
 			"hops" => hops,
