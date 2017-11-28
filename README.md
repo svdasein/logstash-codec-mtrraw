@@ -1,12 +1,13 @@
-# Logstash Plugin
+# logstash-codec-mtrraw
 
-This is a plugin for [Logstash](https://github.com/elastic/logstash).
+This is a codec plugin for [Logstash](https://github.com/elastic/logstash).
 
 It is fully free and fully open source. The license is Apache 2.0, meaning you are pretty much free to use it however you want in whatever way.
 
 ## Documentation
 
-The logstash mtrraw codec wraps together a bunch of logic that makes it easy to use mtr --raw output in your ELK infrastructure.  
+The logstash mtrraw codec wraps together a bunch of logic that makes it easy to use mtr --raw output in your ELK infrastructure (or whatever you're
+sending logstash data to).
 
 ### Installation
 
