@@ -4,6 +4,7 @@ require "logstash/codecs/line"
 require "logstash/namespace"
 require "securerandom"
 require "digest"
+require 'awesome_print'
 
 
 # This codec presumes you've somehow sent in the equivalent of this
@@ -57,7 +58,12 @@ class LogStash::Codecs::Mtrraw < LogStash::Codecs::Base
     if mtrrecs[0].type == 's'
     	target = mtrrecs.shift.data
 	pingcount = 0
-	if target =~ /(\w+) (\d+)/
+	if target =~ /(\w+) (\w+) (\d+)/
+		origin = $1
+		target = $2
+		pingcount = $3
+	elsif target =~ /(\w+) (\d+)/
+		origin = "ORIGIN"
 		target = $1
 		pingcount = $2
 	end
@@ -93,23 +99,26 @@ class LogStash::Codecs::Mtrraw < LogStash::Codecs::Base
 			"avgrtt" => avgrtt,
 			"tags" => ["wholepath"]
 	}
-    yield LogStash::Event.new(tracedata)
+    wholepathevent = LogStash::Event.new(tracedata)
+    yield wholepathevent
     # Construct a starting point for trace to target
     yield LogStash::Event.new({
 	"id" => id,
+	"origin" => origin,
 	"target" => target,
 	"tags" => ["hop"],
 	"seq" => -1,
 	"pathsig" => pathsig,
-	"A_node" => "TO:#{target}",
+	"A_node" => "#{origin}->#{target}",
 	"Z_node" => hops[0][:addr],
-	"dns" => "startingpoint",
+	"dns" => origin,
 	"avgrtt" => 0,
 	"avgloss" => 0
     })
     0.upto(path.size - 2) {
        |index|
        yield LogStash::Event.new({	"id" => id,
+					"origin" => origin,
 					"target" => target,
                                    	"tags" => ["hop"],
 					"pathsig" => pathsig,

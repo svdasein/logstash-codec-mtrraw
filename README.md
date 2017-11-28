@@ -28,11 +28,14 @@ input {
 Feed it with something that's functionally equivalent to this:
 
 ```
-while true ; do (echo "s 0 GOOGDNS 1";mtr --raw --no-dns  -c 1 8.8.8.8 ) | awk '{printf $0";"}'  | nc localhost 4327 ; done
+while true ; do (echo "s 0 MYBOX GOOGDNS 1";mtr --raw --no-dns  -c 1 8.8.8.8 ) | awk '{printf $0";"}'  | nc localhost 4327 ; done
 ```
 
 Put the above in a script, make the script executable, and run it in the background.  It'll continuously feed mtr trace data to
 the codec.
+
+The `agent` subdirectory contains some examples of this.  You may have to play around with paths etc to make it work on your
+system.
 
 Explanation:
 
@@ -43,14 +46,14 @@ The `(echo ...;mtr)` construct allows us to overload the frontend of the trace a
 stream.  The front of the trace has a line that looks like this:
 
 ```
-s 0 <targetname> <pingcount>
+s 0 <originname> <targetname> <pingcount>
 
 ```
 
+* <originname> is a name for the starting point of the trace
 * <targetname> is whatever name you want to give the trace
 * <pingcount> is the number of pings you're going to be doing to each node in the trace. This must match the -c parameter to mtr (see below).
 
-Modify the echo statement accordingly.
 
 The MTR execution part requires the following:
 

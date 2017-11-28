@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name          = 'logstash-codec-mtrraw'
-  s.version       = '0.1.0'
+  s.version       = '0.2.0'
   s.licenses      = ['Apache License (2.0)']
   s.summary       = 'Converts optionally overloaded mtr --raw data to an event'
   s.description   = 'Turn mtr --raw events with optional overloading into logstash events.  see docs'
@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
 
   # Files
-  s.files = Dir['lib/**/*','spec/**/*','vendor/**/*','*.gemspec','*.md','CONTRIBUTORS','Gemfile','LICENSE','NOTICE.TXT']
+  s.files = Dir['agent/*','lib/**/*','spec/**/*','vendor/**/*','*.gemspec','*.md','CONTRIBUTORS','Gemfile','LICENSE','NOTICE.TXT']
    # Tests
   s.test_files = s.files.grep(%r{^(test|spec|features)/})
 
