@@ -6,15 +6,6 @@ require "securerandom"
 require "digest"
 require 'awesome_print'
 
-
-# This codec presumes you've somehow sent in the equivalent of this
-# bash one-liner:
-# (echo "S MYTARGET" ; mtr --raw -c <samplecount> 8.8.8.8) | awk '{printf $1";"}'
-# You can get that into logstash any way you want, e.g. netcat will
-# work if you set up a tcp input:
-# (echo "S MYTARGET" ; mtr --raw -c <samplecount> 8.8.8.8) | awk '{printf $1";"}' | nc <myserver> <myport>
-#
-
 class MtrRec
 	attr_accessor :type,:id,:data
 	def initialize(line)
@@ -133,7 +124,6 @@ class LogStash::Codecs::Mtrraw < LogStash::Codecs::Base
     }
   end # def decode
 
-  # Encode a single event, this returns the raw data to be returned as a String
   def encode_sync(event)
     # Nothing to do.
     @on_event.call(event, event)
