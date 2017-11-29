@@ -105,7 +105,7 @@ class LogStash::Codecs::Mtrraw < LogStash::Codecs::Base
 	"Z_node" => hops[0][:addr],
 	"dns" => origin,
 	"avgrtt" => 0,
-	"avgloss" => 0
+	"pingloss" => 0
     })
     0.upto(path.size - 2) {
        |index|
@@ -119,7 +119,7 @@ class LogStash::Codecs::Mtrraw < LogStash::Codecs::Base
 					"Z_node" => hops[index + 1][:addr],
 					"dns" => hops[index + 1][:dns],
 					"avgrtt" => hops[index + 1][:avgrtt],
-					"avgloss" => hops[index + 1][:avgloss]
+					"pingloss" => hops[index + 1][:pingloss]
 	})
     }
   end # def decode
