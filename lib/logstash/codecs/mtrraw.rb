@@ -49,11 +49,11 @@ class LogStash::Codecs::Mtrraw < LogStash::Codecs::Base
     if mtrrecs[0].type == 's'
     	target = mtrrecs.shift.data
 	pingcount = 0
-	if target =~ /(\w+) (\w+) (\d+)/
+	if target =~ /(\S+) (\S+) (\d+)/
 		origin = $1
 		target = $2
 		pingcount = $3
-	elsif target =~ /(\w+) (\d+)/
+	elsif target =~ /(\S+) (\d+)/
 		origin = "ORIGIN"
 		target = $1
 		pingcount = $2
