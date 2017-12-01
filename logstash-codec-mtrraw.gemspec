@@ -1,9 +1,16 @@
 Gem::Specification.new do |s|
   s.name          = 'logstash-codec-mtrraw'
+<<<<<<< HEAD
   s.version       = '0.2.3'
   s.licenses      = ['Apache License (2.0)']
   s.summary       = 'Converts optionally overloaded mtr --raw data to an event'
   s.description   = 'Translate mtr --raw traces into logstash events'
+=======
+  s.version       = '0.2.4'
+  s.licenses      = ['Apache License (2.0)']
+  s.summary       = 'Converts mtr --raw route trace data to logstash events'
+  s.description   = 'Renders wholepath and hop record types from mtr --raw path trace data'
+>>>>>>> e06892477e4e64a509e0bc073daad9bf4f01de6e
   s.homepage      = 'https://github.com/svdasein/logstash-codec-mtrraw'
   s.authors       = ['svdasein']
   s.email         = 'daveparker01@gmail.com'

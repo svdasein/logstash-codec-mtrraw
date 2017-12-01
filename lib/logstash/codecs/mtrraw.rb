@@ -6,15 +6,6 @@ require "securerandom"
 require "digest"
 require 'awesome_print'
 
-
-# This codec presumes you've somehow sent in the equivalent of this
-# bash one-liner:
-# (echo "S MYTARGET" ; mtr --raw -c <samplecount> 8.8.8.8) | awk '{printf $1";"}'
-# You can get that into logstash any way you want, e.g. netcat will
-# work if you set up a tcp input:
-# (echo "S MYTARGET" ; mtr --raw -c <samplecount> 8.8.8.8) | awk '{printf $1";"}' | nc <myserver> <myport>
-#
-
 class MtrRec
 	attr_accessor :type,:id,:data
 	def initialize(line)
@@ -58,11 +49,11 @@ class LogStash::Codecs::Mtrraw < LogStash::Codecs::Base
     if mtrrecs[0].type == 's'
     	target = mtrrecs.shift.data
 	pingcount = 0
-	if target =~ /(\w+) (\w+) (\d+)/
+	if target =~ /(\S+) (\S+) (\d+)/
 		origin = $1
 		target = $2
 		pingcount = $3
-	elsif target =~ /(\w+) (\d+)/
+	elsif target =~ /(\S+) (\d+)/
 		origin = "ORIGIN"
 		target = $1
 		pingcount = $2
@@ -114,7 +105,7 @@ class LogStash::Codecs::Mtrraw < LogStash::Codecs::Base
 	"Z_node" => hops[0][:addr],
 	"dns" => origin,
 	"avgrtt" => 0,
-	"avgloss" => 0
+	"pingloss" => 0
     })
     0.upto(path.size - 2) {
        |index|
@@ -128,12 +119,11 @@ class LogStash::Codecs::Mtrraw < LogStash::Codecs::Base
 					"Z_node" => hops[index + 1][:addr],
 					"dns" => hops[index + 1][:dns],
 					"avgrtt" => hops[index + 1][:avgrtt],
-					"avgloss" => hops[index + 1][:avgloss]
+					"pingloss" => hops[index + 1][:pingloss]
 	})
     }
   end # def decode
 
-  # Encode a single event, this returns the raw data to be returned as a String
   def encode_sync(event)
     # Nothing to do.
     @on_event.call(event, event)
