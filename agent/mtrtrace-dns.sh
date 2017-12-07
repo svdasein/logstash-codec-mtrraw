@@ -13,5 +13,5 @@ if [ -z "$1" ] ; then
 	exit
 fi
 
-while true ; do echo -n '.'; (echo "s 0 $ORIGIN_NAME $TARGET_NAME $PING_COUNT";mtr --raw -c $PING_COUNT $TARGET_IP ) | awk '{printf $0";"}'  | nc $LOGSTASH_IP $LOGSTASH_PORT ; done
+while true ; do echo -n '.'; (echo "s 0 $ORIGIN_NAME $TARGET_NAME $PING_COUNT";mtr --raw -c $PING_COUNT $TARGET_IP ) | awk '{printf $0";"}'  | nc -w 120 $LOGSTASH_IP $LOGSTASH_PORT ; done
 
